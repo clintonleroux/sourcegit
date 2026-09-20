@@ -48,7 +48,7 @@
           </ItemsPanelTemplate>
         </ListBox.ItemsPanel>
 
-        <ListBoxItem>
+        <ListBoxItem ToolTip.Placement="Right">
           <ToolTip.Tip>
             <TextBlock>
               <Run Text="{DynamicResource Text.Dashboard}" Foreground="{DynamicResource Brush.FG1}"/>
@@ -59,7 +59,7 @@
           <Path Classes="icon" Data="{StaticResource Icons.Dashboard}"/>
         </ListBoxItem>
 
-        <ListBoxItem IsVisible="{Binding !IsBare}">
+        <ListBoxItem IsVisible="{Binding !IsBare}" ToolTip.Placement="Right">
           <ToolTip.Tip>
             <TextBlock>
               <Run Text="{DynamicResource Text.WorkingCopy}" Foreground="{DynamicResource Brush.FG1}"/>
@@ -89,7 +89,7 @@
           </Grid>
         </ListBoxItem>
 
-        <ListBoxItem IsVisible="{Binding !IsBare}">
+        <ListBoxItem IsVisible="{Binding !IsBare}" ToolTip.Placement="Right">
           <ToolTip.Tip>
             <TextBlock>
               <Run Text="{DynamicResource Text.Stashes}" Foreground="{DynamicResource Brush.FG1}"/>
@@ -119,7 +119,8 @@
               Width="40" Height="40"
               Margin="4,0"
               Click="OnOpenConfigure"
-              ToolTip.Tip="{DynamicResource Text.Repository.Configure}">
+              ToolTip.Tip="{DynamicResource Text.Repository.Configure}"
+              ToolTip.Placement="Right">
         <Path Width="18" Height="18" Data="{StaticResource Icons.Settings}"/>
       </Button>
     </Grid>
@@ -240,15 +241,13 @@
           <!-- Main Body -->
           <Grid Grid.Row="1" Background="{DynamicResource Brush.Window}">
             <Grid.ColumnDefinitions>
-              <ColumnDefinition Width="{Binding #ThisControl.SidebarWidth, Mode=TwoWay}" MinWidth="200"/>
-              <ColumnDefinition Width="3"/>
+              <ColumnDefinition Width="{Binding #ThisControl.SidebarWidth, Mode=TwoWay}" MinWidth="{Binding #ThisControl.SidebarMinWidth, Mode=OneWay}"/>
+              <ColumnDefinition Width="Auto"/>
               <ColumnDefinition Width="*" MinWidth="100"/>
             </Grid.ColumnDefinitions>
 
             <!-- Sidebar (Branches/Remotes/Tags/Submodules/Worktrees) -->
-            <Grid Grid.Column="0"
-                  RowDefinitions="Auto,*"
-                  IsVisible="{Binding !#ThisControl.IsCommitSearchPanelVisible, Mode=OneWay}">
+            <Grid Grid.Column="0" RowDefinitions="Auto,*" IsVisible="{Binding #ThisControl.IsNormalSidebarVisible, Mode=OneWay}">              
               <!-- Filter Branches/Tags/Submodules -->
               <TextBox Grid.Row="0"
                        x:Name="FilterBox"
@@ -570,12 +569,19 @@
 
             <!-- Splitter -->
             <GridSplitter Grid.Column="1"
-                          MinWidth="1"
+                          Width="3" MinWidth="3" MaxWidth="3"
                           HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                           Background="Transparent"
                           BorderThickness="0,0,1,0"
                           BorderBrush="{DynamicResource Brush.Border0}"
-                          Focusable="False"/>
+                          Focusable="False">
+              <GridSplitter.IsVisible>
+                <MultiBinding Converter="{x:Static BoolConverters.Or}">
+                  <Binding ElementName="ThisControl" Path="IsCommitSearchPanelVisible"/>
+                  <Binding ElementName="ThisControl" Path="IsNormalSidebarVisible"/>
+                </MultiBinding>
+              </GridSplitter.IsVisible>
+            </GridSplitter>
 
             <!-- Right Page -->
             <Grid Grid.Column="2">
@@ -678,7 +684,7 @@
                   </Grid>
 
                   <!-- History Filter Bar -->
-                  <Border Grid.Row="1" Background="{DynamicResource Brush.ToolBar}" BorderThickness="0,0,0,1" BorderBrush="{DynamicResource Brush.Border0}">
+                  <Border Grid.Row="1" Background="{DynamicResource Brush.Popup}" BorderThickness="0,0,0,1" BorderBrush="{DynamicResource Brush.Border0}">
                     <Border.IsVisible>
                       <MultiBinding Converter="{x:Static BoolConverters.And}">
                         <Binding Path="SelectedViewIndex" Converter="{x:Static c:IntConverters.IsZero}"/>
